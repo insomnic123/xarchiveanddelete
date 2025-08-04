@@ -28,7 +28,9 @@ export async function GET() {
     const tweets = []
     let nextToken = null
     let requestCount = 0
-    const MAX_REQUESTS = 5 
+    const MAX_REQUESTS = 5
+
+    let lastRateLimitInfo = null
 
     do {
       if (requestCount >= MAX_REQUESTS) {
@@ -41,7 +43,7 @@ export async function GET() {
         'tweet.fields': 'created_at,text,public_metrics,referenced_tweets',
         'expansions': 'referenced_tweets.id'
       }
-      
+
       if (nextToken) {
         params.pagination_token = nextToken
       }
@@ -56,24 +58,41 @@ export async function GET() {
         }
       )
 
+      // 🔽 Log rate limit headers
+      const rateLimit = response.headers['x-rate-limit-limit']
+      const remaining = response.headers['x-rate-limit-remaining']
+      const reset = response.headers['x-rate-limit-reset']
+
+      console.log('\n--- Rate Limit Info ---')
+      console.log('Limit:     ', rateLimit)
+      console.log('Remaining: ', remaining)
+      console.log('Reset At:  ', reset ? new Date(reset * 1000).toLocaleString() : 'N/A')
+
+      lastRateLimitInfo = {
+        limit: rateLimit,
+        remaining,
+        resetTime: reset ? new Date(reset * 1000).toLocaleString() : null
+      }
+
       if (response.data.data) {
         tweets.push(...response.data.data)
       }
-      
+
       nextToken = response.data.meta?.next_token
       requestCount++
-      
+
       if (nextToken) {
         await new Promise(resolve => setTimeout(resolve, 1000))
       }
-      
+
     } while (nextToken && requestCount < MAX_REQUESTS)
 
     return NextResponse.json({ 
       tweets, 
       count: tweets.length,
       hasMore: !!nextToken,
-      message: requestCount >= MAX_REQUESTS ? 'Limited results to avoid rate limits' : undefined
+      message: requestCount >= MAX_REQUESTS ? 'Limited results to avoid rate limits' : undefined,
+      rateLimit: lastRateLimitInfo // Optional: return for debugging/testing
     })
   } catch (error) {
     if (error.response?.status === 429) {
@@ -82,7 +101,7 @@ export async function GET() {
         rateLimited: true 
       }, { status: 429 })
     }
-    
+
     console.error('Error fetching tweets:', error.response?.data || error.message)
     return NextResponse.json({ error: 'Failed to fetch tweets' }, { status: 500 })
   }
