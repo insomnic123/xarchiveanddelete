@@ -10,12 +10,10 @@ export async function GET() {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  // DEBUG: Log the entire session to see what we have
   console.log('Full session:', JSON.stringify(session, null, 2))
   console.log('User ID:', session.user?.id)
   console.log('Access Token:', session.accessToken ? 'Present' : 'Missing')
 
-  // If no user ID, return early with debug info
   if (!session.user?.id) {
     return NextResponse.json({ 
       error: 'User ID not found in session',
@@ -30,8 +28,8 @@ export async function GET() {
     const tweets = []
     let nextToken = null
     let requestCount = 0
-    const MAX_REQUESTS = 10 // Limit to avoid hitting rate limits
-    
+    const MAX_REQUESTS = 5 
+
     do {
       if (requestCount >= MAX_REQUESTS) {
         console.log('Stopping to avoid rate limits')
