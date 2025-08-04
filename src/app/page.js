@@ -237,6 +237,9 @@ export default function Home() {
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-yellow-800 mb-2">⚠️ Important Notes</h3>
           <ul className="text-sm text-yellow-700 space-y-1">
+            <li>• <strong> THIS IS A TEST APP -- As much as I would love to make it official, X has a very very very restrictive plan. If it doesn't work, it's likely due to the rate limits. If you somehow know someone who can get the free plan to be more than a joke please let them know T_T</strong></li>
+            <li>• If you want to see this function, feel free to create your own X project with all the scopes and copy the credentials into a .env.local! The .env setup is: <br/>
+            NEXTAUTH_URL <br/> NEXTAUTH_SECRET <br/> TWITTER_CLIENT_ID <br />TWITTER_CLIENT_SECRET<br/></li>
             <li>• Always download a backup before deleting tweets -- you never know where it may be useful/needed!</li>
             <li>• Deletion is permanent and cannot be undone, as per X guidelines</li>
             <li>• Retweets and quote tweets will also be removed!</li>
