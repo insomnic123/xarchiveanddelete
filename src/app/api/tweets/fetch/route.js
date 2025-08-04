@@ -28,7 +28,7 @@ export async function GET() {
     const tweets = []
     let nextToken = null
     let requestCount = 0
-    const MAX_REQUESTS = 5
+    const MAX_REQUESTS = 1
 
     let lastRateLimitInfo = null
 
@@ -48,6 +48,11 @@ export async function GET() {
         params.pagination_token = nextToken
       }
 
+      if (lastRateLimitInfo && lastRateLimitInfo.remaining === '0') {
+        console.warn(`Rate limit reached. Waiting until reset at ${lastRateLimitInfo.resetTime}. Stopping requests.`)
+        break
+      }
+
       const response = await axios.get(
         `https://api.twitter.com/2/users/${session.user.id}/tweets`,
         {
@@ -58,7 +63,6 @@ export async function GET() {
         }
       )
 
-      // 🔽 Log rate limit headers
       const rateLimit = response.headers['x-rate-limit-limit']
       const remaining = response.headers['x-rate-limit-remaining']
       const reset = response.headers['x-rate-limit-reset']
@@ -72,6 +76,10 @@ export async function GET() {
         limit: rateLimit,
         remaining,
         resetTime: reset ? new Date(reset * 1000).toLocaleString() : null
+      }
+
+      if (remaining === '0') {
+        console.warn(`Rate limit reached during this request. Next reset at ${lastRateLimitInfo.resetTime}`)
       }
 
       if (response.data.data) {
@@ -92,7 +100,7 @@ export async function GET() {
       count: tweets.length,
       hasMore: !!nextToken,
       message: requestCount >= MAX_REQUESTS ? 'Limited results to avoid rate limits' : undefined,
-      rateLimit: lastRateLimitInfo // Optional: return for debugging/testing
+      rateLimit: lastRateLimitInfo
     })
   } catch (error) {
     if (error.response?.status === 429) {

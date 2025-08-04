@@ -237,10 +237,10 @@ export default function Home() {
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-yellow-800 mb-2">⚠️ Important Notes</h3>
           <ul className="text-sm text-yellow-700 space-y-1">
-            <li>• Always download a backup before deleting tweets</li>
-            <li>• Deletion is permanent and cannot be undone</li>
-            <li>• The process respects X's rate limits (may take time for large accounts)</li>
-            <li>• Retweets and quote tweets will also be removed</li>
+            <li>• Always download a backup before deleting tweets -- you never know where it may be useful/needed!</li>
+            <li>• Deletion is permanent and cannot be undone, as per X guidelines</li>
+            <li>• Retweets and quote tweets will also be removed!</li>
+            <li>• The X rate limit on the free plan is DIABOLICAL, but in the spirit of keeping this as a free service, please be advised that you can only load your tweets every 15 minutes, and the deletion process may take a while. There are better services out there, albeit for a small fee.</li>
           </ul>
         </div>
       </main>
